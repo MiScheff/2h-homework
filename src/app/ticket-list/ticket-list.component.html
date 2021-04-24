@@ -1,0 +1,80 @@
+<div>
+	<h3>
+		Ticket list
+	</h3>
+	<input
+		type="text"
+		style="padding:8px;margin:15px auto;width:30%;"
+		placeholder="Type to filter the name column..."
+		(keyup)="updateFilter($event)"
+	/>
+	<button (click)="openAddTicketModal()" class="btn btn-primary mx-2">Add ticket</button>
+	<ngx-datatable
+		#table
+		class="material"
+		[columns]="columns"
+		[columnMode]="ColumnMode.force"
+		[headerHeight]="50"
+		[footerHeight]="50"
+		rowHeight="auto"
+		[rows]="rows"
+	>
+
+		<ng-template #hdrTpl let-column="column">{{ column.name }}</ng-template>
+
+		<ng-template #editTmpl let-row="row" let-column="column" let-value="value">
+			<ng-container *ngIf="column.name === ''">
+				<button class="btn btn-primary m-1" (click)="openAssignModal(row.id)">Assign</button>
+				<button class="btn btn-success m-1" (click)="complete(row.id)" *ngIf="!row.completed">Done</button>
+				<button class="btn btn-danger m-1" (click)="complete(row.id)" *ngIf="row.completed">Undone</button>
+			</ng-container>
+			<ng-container *ngIf="column.name == 'assigneeId'">
+			</ng-container>
+			<ng-container *ngIf="column.name == 'Status'">
+				{{ row.completed ? 'Complété' : 'Non complété'}}
+
+			</ng-container>
+			<ng-container *ngIf="column.name !== ''">
+				{{ value }}
+			</ng-container>
+
+
+		</ng-template>
+	</ngx-datatable>
+
+	<ng-template #assignModal let-modal>
+		<div class="modal-header">
+			<h4 class="modal-title" id="modal-basic-title">Assigner une personne à ce ticket</h4>
+			<button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+				<span aria-hidden="true">×</span>
+			</button>
+		</div>
+		<div class="modal-body">
+			<ul>
+				<li *ngFor="let user of users$ | async" class="d-block">
+					<button class="btn btn-light" (click)="assign(user.id)">{{ user.name }}</button>
+				</li>
+			</ul>
+		</div>
+		<div class="modal-footer">
+			<button type="button" class="btn btn-danger" (click)="modal.close('Save click')">Close</button>
+		</div>
+	</ng-template>
+	
+	<ng-template #ticketModal let-modal>
+		<div class="modal-header">
+			<h4 class="modal-title" id="modal-basic-title">Ajouter un ticket</h4>
+			<button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+				<span aria-hidden="true">×</span>
+			</button>
+		</div>
+		<div class="modal-body">
+			<label for="description" class="d-block">Description du ticket</label>
+			<textarea class="d-block w-100" name="description" id="description" cols="30" rows="10" #description></textarea>
+			<button class="btn btn-success my-2" (click)="addTicket(description)">Ajouter</button>
+		</div>
+		<div class="modal-footer">
+			<button type="button" class="btn btn-danger" (click)="modal.close('Save click')">Close</button>
+		</div>
+	</ng-template>
+</div>
